@@ -1,0 +1,16 @@
+<html>
+<body>
+<pre>
+<h1>µVision Build Log</h1>
+<h2>Project:</h2>
+C:\Users\DU\Desktop\jishi\jishi.uvproj
+Project File Date:  07/05/2019
+
+<h2>Output:</h2>
+Build target 'Target 1'
+compiling jishi.c...
+JISHI.C(15): warning C290: missing return value
+linking...
+Program Size: data=11.0 xdata=0 code=225
+creating hex file from "jishi"...
+"jishi" - 0 Error(s), 1 Warning(s).

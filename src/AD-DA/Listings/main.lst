@@ -1,0 +1,173 @@
+C51 COMPILER V9.00   MAIN                                                                  03/18/2021 21:40:08 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: D:\Program Files (x86)\keil\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRIN
+                    -T(.\Listings\main.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include <reg52.h>
+   2          #include "eboard.h"
+   3          #include <intrins.h>
+   4          
+   5          #define uchar unsigned char
+   6          #define uint unsigned int
+   7          #define somenop() _nop_(),_nop_(),_nop_(),_nop_(),_nop_(),_nop_()
+   8          #define  WRITEADDR 0x90    //Ð´µØÖ·
+   9          #define  READADDR  0x91    //¶ÁµØÖ·
+  10          
+  11          sbit SCL=P2^1;
+  12          sbit SDA=P2^0;
+  13          
+  14          void I2C_Start()     //ÆðÊ¼
+  15          {
+  16   1         SCL=1;
+  17   1         somenop();
+  18   1         SDA=1;
+  19   1         somenop();
+  20   1         SDA=0;
+  21   1         somenop();
+  22   1         SCL=0;
+  23   1         somenop();
+  24   1      }
+  25          void I2C_Stop()      //ÖÕÖ¹
+  26          {  
+  27   1         SDA=0;
+  28   1         somenop();
+  29   1         SCL=1;
+  30   1         somenop();
+  31   1         SDA=1;
+  32   1         somenop();
+  33   1      }
+  34          void I2C_SendByte(uchar dat)   //·¢ËÍÒ»¸ö×Ö½Ú
+  35          {
+  36   1         uchar i,j,b=0;
+  37   1         for(i=0;i<8;i++)
+  38   1         {    
+  39   2             SCL=0;  
+  40   2             somenop();   
+  41   2             SDA=(bit)(dat&0x80);     //Ã¿´ÎÈ¡×î¸ßÎ»½øÐÐ·¢ËÍ
+  42   2             dat<<=1;        //´Ó×î¸ßÎ»¿ªÊ¼·¢ËÍ£¬×óÒÆÊ¹Ã¿Ò»Î»Öð½¥³ÉÎª×î¸ßÎ»
+  43   2             SCL=1;          //ÉÏÉýÑØÊ±·¢ËÍÊý¾Ý
+  44   2             somenop();      
+  45   2         }
+  46   1         SCL=0;
+  47   1         somenop(); 
+  48   1         SDA=1;     
+  49   1         somenop();
+  50   1         SCL=1;
+  51   1         _nop_();
+  52   1         while((SDA==1)&&(j<250))  j++;  //µÈ´ýÓ¦´ð£¬Ò²¾ÍÊÇµÈ´ý´ÓÉè±¸°ÑSDAÀ­µÍ
+  53   1         SCL=0;
+  54   1         _nop_();   
+C51 COMPILER V9.00   MAIN                                                                  03/18/2021 21:40:08 PAGE 2   
+
+  55   1      }
+  56          uchar I2C_ReadByte()     //¶ÁÒ»¸ö×Ö½Ú
+  57          {
+  58   1         uchar i,dat=0;
+  59   1         SCL=0;         //´Ë´¦Ò²¿ÉÒÔ²»ÖÃµÍ£¬ÒòÎªÆðÊ¼ºÍ·¢ËÍÒ»¸ö×Ö½ÚÖ®ºóSCL¶¼ÊÇ0
+  60   1         somenop();
+  61   1         SDA=1;      //À­¸ß×¼±¸Êý¾Ý¶ÁÈ¡
+  62   1         _nop_();
+  63   1         for(i=0;i<8;i++)   //¶ÁÈ¡8Î»Êý¾Ý
+  64   1         {
+  65   2            SCL=1;
+  66   2            somenop();
+  67   2            dat<<=1;
+  68   2            if(SDA==1)
+  69   2               dat=dat|0x01;
+  70   2            somenop();
+  71   2            SCL=0;     //ÏÂ½µÑØÊ±¶ÁÈ¡Êý¾Ý
+  72   2            somenop();
+  73   2          }
+  74   1          return dat;
+  75   1      }
+  76          
+  77          
+  78          void Pcf8591SendByte(uchar channel)
+  79          {   
+  80   1          I2C_Start();   
+  81   1          I2C_SendByte(WRITEADDR);        //·¢ËÍÐ´Æ÷¼þµØÖ·
+  82   1          I2C_SendByte(0x40|channel);     //·¢ËÍ¿ØÖÆ¼Ä´æÆ÷
+  83   1          I2C_Stop();
+  84   1      }
+  85          
+  86          uchar Pcf8591ReadByte()
+  87          {
+  88   1          uchar num;
+  89   1          I2C_Start();
+  90   1          I2C_SendByte(READADDR);      //·¢ËÍ¶ÁÆ÷¼þµØÖ·
+  91   1          num=I2C_ReadByte();          //¶ÁÈ¡Êý¾Ý
+  92   1          I2C_Stop();                  //½áÊø×ÜÏß
+  93   1          return num;
+  94   1      }
+  95          /******************************************************************* 
+  96          DAC ±ä»», ×ª»¯º¯Êý                
+  97          *******************************************************************/  
+  98          void DACconversion(unsigned char sla,unsigned char c,  unsigned char Val)  
+  99          {  
+ 100   1         I2C_Start();                //Æô¶¯×ÜÏß  
+ 101   1         I2C_SendByte(sla);            //·¢ËÍÆ÷¼þµØÖ·  
+ 102   1         I2C_SendByte(c);              //·¢ËÍ¿ØÖÆ×Ö½Ú  
+ 103   1         I2C_SendByte(Val);            //·¢ËÍDACµÄÊýÖµ     
+ 104   1         I2C_Stop();           //½áÊø×ÜÏß  
+ 105   1      }  
+ 106          
+ 107          void main()
+ 108          {
+ 109   1        uint adNum,ad;
+ 110   1        float value;
+ 111   1        uchar dat[6];
+ 112   1        
+ 113   1        init_1602();
+ 114   1        while(1)
+ 115   1        {
+ 116   2          P0=0xff;
+C51 COMPILER V9.00   MAIN                                                                  03/18/2021 21:40:08 PAGE 3   
+
+ 117   2          Pcf8591SendByte(0);      //Ê¹ÓÃÍ¨µÀ0
+ 118   2          /*adNumÒ»¶¨ÊÇ0µ½255Ö®¼äµÄÒ»¸öÊý£¬ÒòÎªpcf8591ÊÇ8Î»µÄAD/DAÐ¾Æ¬£¬ËùÒÔÊä³öµÄ·¶Î§Îª00000000µ½11111111£¬¼´0µ
+             -½255*/
+ 119   2          ad=Pcf8591ReadByte();   //¶Á³öÊýÖµ
+ 120   2          
+ 121   2          /*½«adNum×ª»»³ÉµçÑ¹Öµ£¬µ¥Æ¬»úµÄµçÑ¹Îª5V£¬ÔòµçÎ»Æ÷µÄµçÑ¹Îª0µ½5V£¬ÓÃ0µ½255±íÊ¾0µ½5V£¬ÔòÃ¿Ò»¸ö1´ú±í5/255V
+             -£¬¼´0.01953V*/
+ 122   2          value=ad*0.01953;  //×ªÎªµçÑ¹Öµ
+ 123   2          adNum=value*100;        //±£ÁôÁ½Î»Ð¡Êý£¬ÒÔ±ãÏÔÊ¾³öÀ´
+ 124   2          
+ 125   2      
+ 126   2          dat[0]=adNum/1000;
+ 127   2          dat[1]=adNum%1000/100;
+ 128   2          dat[2]='.';
+ 129   2          dat[3]=adNum%100/10;
+ 130   2          dat[4]=adNum%10;
+ 131   2          dat[5]='V';
+ 132   2          
+ 133   2          write_1602(0x80+8,0);
+ 134   2          write_1602(0x30+dat[0],1);
+ 135   2          write_1602(0x30+dat[1],1);
+ 136   2          write_1602(dat[2],1);
+ 137   2          write_1602(0x30+dat[3],1);
+ 138   2          write_1602(0x30+dat[4],1);
+ 139   2          write_1602(dat[5],1);
+ 140   2          
+ 141   2          DACconversion(WRITEADDR,0x40,ad);
+ 142   2          }
+ 143   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    460    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----      16
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

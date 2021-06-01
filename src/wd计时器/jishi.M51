@@ -1,0 +1,109 @@
+BL51 BANKED LINKER/LOCATER V6.22                                                        07/05/2019  23:41:08  PAGE 1
+
+
+BL51 BANKED LINKER/LOCATER V6.22, INVOKED BY:
+C:\KEIL\C51\BIN\BL51.EXE jishi.obj TO jishi RAMSIZE (256)
+
+
+MEMORY MODEL: SMALL
+
+
+INPUT MODULES INCLUDED:
+  jishi.obj (JISHI)
+  C:\KEIL\C51\LIB\C51S.LIB (?C_STARTUP)
+  C:\KEIL\C51\LIB\C51S.LIB (?C_INIT)
+
+
+LINK MAP OF MODULE:  jishi (JISHI)
+
+
+            TYPE    BASE      LENGTH    RELOCATION   SEGMENT NAME
+            -----------------------------------------------------
+
+            * * * * * * *   D A T A   M E M O R Y   * * * * * * *
+            REG     0000H     0008H     ABSOLUTE     "REG BANK 0"
+            DATA    0008H     0002H     UNIT         ?DT?JISHI
+            IDATA   000AH     0001H     UNIT         ?STACK
+
+            * * * * * * *   C O D E   M E M O R Y   * * * * * * *
+            CODE    0000H     0003H     ABSOLUTE     
+            CODE    0003H     008CH     UNIT         ?C_C51STARTUP
+            CODE    008FH     002DH     UNIT         ?PR?MAIN?JISHI
+            CODE    00BCH     0020H     UNIT         ?PR?_TIME?JISHI
+            CODE    00DCH     0005H     UNIT         ?C_INITSEG
+
+
+
+OVERLAY MAP OF MODULE:   jishi (JISHI)
+
+
+SEGMENT
+  +--> CALLED SEGMENT
+---------------------
+?C_C51STARTUP
+  +--> ?PR?MAIN?JISHI
+  +--> ?C_INITSEG
+
+?PR?MAIN?JISHI
+  +--> ?PR?_TIME?JISHI
+
+
+
+SYMBOL TABLE OF MODULE:  jishi (JISHI)
+
+  VALUE           TYPE          NAME
+  ----------------------------------
+
+  -------         MODULE        JISHI
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  D:0090H         PUBLIC        P1
+  D:00B0H         PUBLIC        P3
+  D:00A8H         PUBLIC        IE
+BL51 BANKED LINKER/LOCATER V6.22                                                      07/05/2019  23:41:08  PAGE 2
+
+
+  D:00B8H         PUBLIC        IP
+  C:008FH         PUBLIC        main
+  C:00BCH         PUBLIC        _time
+  D:0098H         PUBLIC        SCON
+  D:0088H         PUBLIC        TCON
+  B:0090H.0       PUBLIC        led
+  D:0008H         PUBLIC        a
+  D:00C8H         PUBLIC        T2CON
+  B:0090H.2       PUBLIC        sw
+  D:00D0H         PUBLIC        PSW
+  -------         PROC          _TIME
+  D:0006H         SYMBOL        M
+  -------         DO            
+  D:0006H         SYMBOL        a
+  D:0004H         SYMBOL        b
+  -------         ENDDO         
+  C:00BCH         LINE#         8
+  C:00BCH         LINE#         9
+  C:00BCH         LINE#         11
+  C:00C7H         LINE#         12
+  C:00C7H         LINE#         13
+  C:00D4H         LINE#         14
+  C:00DBH         LINE#         15
+  -------         ENDPROC       _TIME
+  -------         PROC          MAIN
+  C:008FH         LINE#         16
+  C:008FH         LINE#         17
+  C:008FH         LINE#         18
+  C:008FH         LINE#         19
+  C:008FH         LINE#         20
+  C:009CH         LINE#         21
+  C:009CH         LINE#         22
+  C:009EH         LINE#         23
+  C:00A0H         LINE#         24
+  C:00A7H         LINE#         25
+  C:00A9H         LINE#         26
+  C:00B0H         LINE#         27
+  C:00B8H         LINE#         28
+  C:00B8H         LINE#         29
+  C:00BAH         LINE#         30
+  -------         ENDPROC       MAIN
+  -------         ENDMOD        JISHI
+
+Program Size: data=11.0 xdata=0 code=225
+LINK/LOCATE RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)

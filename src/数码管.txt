@@ -1,0 +1,225 @@
+#include<reg51.h>
+
+sbit led1=P0^0;
+sbit led2=P0^1;
+sbit a=P1^0;
+sbit b=P1^1;
+sbit c=P1^2;
+sbit d=P1^3;
+sbit e=P1^4;
+sbit f=P1^5;
+sbit g=P1^6;
+sbit dp=P1^7;
+
+void ys(int b)
+{
+	int i,x,y;
+	i=b;
+	for(x=i;x>0;x--)
+		for(y=114;y>0;y--);	
+}
+
+void ff()
+{
+	a=1;
+	b=1;
+	c=1;
+	d=1;
+	e=1;
+	f=1;
+	g=1;
+	dp=1;
+
+}
+
+void zero()
+{
+	ff();
+	c=0;
+	b=0;
+	d=0;
+	e=0;
+	g=0;
+	f=0;		
+}
+
+void one()
+{
+	ff();
+	d=0;
+	g=0;
+}
+
+void two()
+{
+	ff();
+	c=0;
+	d=0;
+	a=0;
+	e=0;
+	f=0;
+}
+
+void three()
+{
+	ff();
+	c=0;
+	d=0;
+	a=0;
+	g=0;
+	f=0;
+}
+
+void four()
+{
+	ff();
+	b=0;
+	a=0;
+	d=0;
+	g=0;
+}
+
+void five()
+{
+	ff();
+	c=0;
+	b=0;
+	a=0;
+	g=0;
+	f=0;
+}
+
+void six()
+{
+	ff();
+	c=0;
+	b=0;
+	a=0;
+	g=0;
+	f=0;
+	e=0;
+}
+
+void seven()
+{
+	ff();
+	c=0;
+	d=0;
+	g=0;
+}
+
+void eight()
+{
+	ff();
+	c=0;
+	b=0;
+	a=0;
+	d=0;
+	e=0;
+	f=0;
+	g=0;
+}
+
+void nine()
+{
+		ff();
+		c=0;
+		b=0;
+		a=0;
+		d=0;
+		g=0;
+		f=0;
+}
+
+void ledtwo()
+{
+	led2=1;
+	zero();
+	ys(1000);
+	one();
+	ys(1000);
+	two();
+	ys(1000);
+	three();
+	ys(1000);
+	four();
+	ys(1000);
+	five();
+	ys(1000);
+	six();
+	ys(1000);
+	seven();
+	ys(1000);
+	eight();
+	ys(1000);
+	nine();
+	ys(1000);	
+}							   
+void main()
+{
+	while(1)
+	{
+		ff();
+		led2=0;
+		led1=1;
+		zero();
+		led1=0;
+		ledtwo();
+
+		
+		led2=0;
+		led1=1;
+		one();
+		led1=0;
+		ledtwo();
+
+		led2=0;
+		led1=1;
+		two();
+		led1=0;
+		ledtwo();
+
+		led2=0;
+		led1=1;
+		three();
+		led1=0;
+		ledtwo();
+
+		led2=0;
+		led1=1;
+		four();
+		led1=0;
+		ledtwo();
+
+		led2=0;
+		led1=1;
+		five();
+		led1=0;
+		ledtwo();
+
+		led2=0;
+		led1=1;
+		six();
+		led1=0;
+		ledtwo();
+
+		led2=0;
+		led1=1;
+		seven();
+		led1=0;
+		ledtwo();
+
+		led2=0;
+		led1=1;
+		eight();
+		led1=0;
+		ledtwo();
+
+		led2=0;
+		led1=1;
+		nine();
+		led1=0;
+		ledtwo();
+							
+	}
+}

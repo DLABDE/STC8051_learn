@@ -1,0 +1,357 @@
+C51 COMPILER V9.00   EBOARD                                                                03/22/2020 16:33:49 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE EBOARD
+OBJECT MODULE PLACED IN .\Objects\eboard.obj
+COMPILER INVOKED BY: D:\Program Files (x86)\keil\C51\BIN\C51.EXE eboard.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PR
+                    -INT(.\Listings\eboard.lst) TABS(2) OBJECT(.\Objects\eboard.obj)
+
+line level    source
+
+   1          #include"eboard.h"
+   2          #include<intrins.h>
+   3          
+   4          
+   5          ///////////////////////////////////////////(I2c)(at24c02[0xa0]与pcf8591[0x90])////////////////////////////
+             -//
+   6          void start_i2c()     //write_i2c(0xa0,1,0x30+1); read_i2c(0xa0,1); 存入0x31到1中 然后读出 
+   7          {             //读写之间间隔10ms
+   8   1        sda=1; 
+   9   1        scl=1;           //write_i2c(0x09,0x40,255);输出电压数字量0-255(0-5v)   read_i2c(0x90,0x01);读出1通道的数字量
+  10   1        _nop_();                   
+  11   1        sda=0;
+  12   1        scl=0;
+  13   1        _nop_();      
+  14   1      }
+  15          void end_i2c()
+  16          {
+  17   1          sda=0;        
+  18   1          scl=1;
+  19   1          delay_i2c();
+  20   1          sda=1;
+  21   1        scl=0;
+  22   1          delay_i2c();
+  23   1      }
+  24          void waitack_i2c()
+  25          {
+  26   1          unsigned char i = 0;
+  27   1          scl=1;
+  28   1          delay_i2c();
+  29   1          while(sda==1&&i<250)i++;
+  30   1          scl=0;            
+  31   1          delay_i2c();
+  32   1      }
+  33          void writebyte_i2c(unsigned char dat)
+  34          {
+  35   1          unsigned char i;
+  36   1          for(i=0;i<8;i++)
+  37   1          {
+  38   2              scl=0;
+  39   2              delay_i2c();
+  40   2              sda=(dat>>(7-i))&0x01;
+  41   2          delay_i2c();
+  42   2              scl=1;
+  43   2              delay_i2c();
+  44   2          }
+  45   1          scl=0;
+  46   1          sda=1;            
+  47   1          _nop_();
+  48   1      }
+  49          unsigned char readbyte_i2c()
+  50          {
+  51   1          unsigned char dat=0,tmp,i;
+  52   1          scl=0;
+  53   1          delay_i2c();
+C51 COMPILER V9.00   EBOARD                                                                03/22/2020 16:33:49 PAGE 2   
+
+  54   1          for(i=0;i<8;i++)
+  55   1          {
+  56   2              scl=1;        
+  57   2              delay_i2c();
+  58   2              tmp=sda;
+  59   2              dat=dat<<1;
+  60   2              dat=dat|tmp;
+  61   2              delay_i2c();
+  62   2              scl=0;        
+  63   2              delay_i2c();
+  64   2          }
+  65   1          return dat;
+  66   1      }
+  67          void write_i2c(unsigned char s,unsigned char unit_addr,unsigned char dat)
+  68          {
+  69   1          start_i2c();
+  70   1          writebyte_i2c(s);
+  71   1          waitack_i2c();
+  72   1          writebyte_i2c(unit_addr);
+  73   1          waitack_i2c();
+  74   1          writebyte_i2c(dat);
+  75   1          waitack_i2c();
+  76   1          end_i2c();
+  77   1        //delay(10);
+  78   1      }
+  79          unsigned char read_i2c(unsigned char s,unsigned char unit_addr)
+  80          {
+  81   1          unsigned char dat;
+  82   1          start_i2c();
+  83   1          writebyte_i2c(s);
+  84   1          waitack_i2c();
+  85   1          writebyte_i2c(unit_addr);
+  86   1          waitack_i2c();
+  87   1          start_i2c();
+  88   1          writebyte_i2c(s+1);
+  89   1          waitack_i2c();
+  90   1          dat=readbyte_i2c();
+  91   1        waitack_i2c();
+  92   1          end_i2c();
+  93   1          //return (s==0x09)?((int)(5*dat/255.0*100+0.5)):dat;
+  94   1        return dat;
+  95   1      }
+  96          void delay_i2c()
+  97          {
+  98   1        _nop_();_nop_();_nop_();_nop_();_nop_();_nop_();_nop_();
+  99   1      }
+ 100          //////////////////////////////////////////////////////////////////////////28byj-48/////////////////////
+ 101          void byj(unsigned char right,unsigned int anglea,unsigned char delaybai)
+ 102          {
+ 103   1        unsigned char bjright[]={0x08,0x0c,0x04,0x06,0x02,0x03,0x01,0x09};
+ 104   1        unsigned char bjleft[]={0x09,0x01,0x03,0x02,0x06,0x04,0x0c,0x08};
+ 105   1        unsigned char i;
+ 106   1        unsigned int ii,angle=8*anglea;       //8*8内一圈，8*8*64外一圈，内一圈即5.625°  ，一个8就是0.703125°
+ 107   1        for(ii=0;ii<angle;ii++)
+ 108   1        {
+ 109   2          if(right==1)
+ 110   2          {
+ 111   3            for(i=0;i<8;i++)        
+ 112   3            {
+ 113   4              P1=bjright[i];
+ 114   4              delay100us(delaybai);
+ 115   4            }
+C51 COMPILER V9.00   EBOARD                                                                03/22/2020 16:33:49 PAGE 3   
+
+ 116   3          }
+ 117   2          else if(right==0)
+ 118   2          {
+ 119   3            for(i=0;i<8;i++)        
+ 120   3            {
+ 121   4              P1=bjleft[i];
+ 122   4              delay100us(delaybai);
+ 123   4            }
+ 124   3          }
+ 125   2        }
+ 126   1      }
+ 127          void delay100us(unsigned char b)   //误差 -0.173611111111us
+ 128          {
+ 129   1          unsigned char a;
+ 130   1          for(;b>0;b--)
+ 131   1              for(a=43;a>0;a--);
+ 132   1      }
+ 133          /////////////////////////////////ds18b20///////////
+ 134          int read_dstemper()
+ 135          {    
+ 136   1         unsigned char a,b,c=0;         
+ 137   1         int t;
+ 138   1         c=init_ds18b20();
+ 139   1         if(c)return 999; 
+ 140   1         delay(1);      
+ 141   1         ds_write(0xcc);   //跳过ROM操作命令
+ 142   1         ds_write(0x44);     //发送启动温度转换命令 
+ 143   1         c=init_ds18b20();
+ 144   1         if(c)return 999; 
+ 145   1         delay(1);        
+ 146   1         ds_write(0xcc);    //跳过ROM操作命令
+ 147   1         ds_write(0xbe);      //发送读温度寄存器命令
+ 148   1         a=ds_read();    //先读低八位
+ 149   1         b=ds_read();      //再读高八位
+ 150   1         t=b;        
+ 151   1         t<<=8;      //左移八位
+ 152   1         t=t|a;      //t为16位的数，使高八位为b的值，低八位为a的值  
+ 153   1         return t;    //返回温度值   //若<0(为负数)则先temper=temper-1;temper=~temper;再*0.0625*100+0.5
+ 154   1      }
+ 155          unsigned char ds_read()
+ 156          {
+ 157   1        unsigned int i=0,j;
+ 158   1        unsigned char bi,byte;  
+ 159   1        for(j=8;j>0;j--)
+ 160   1        {
+ 161   2          ds_out=0;
+ 162   2          i++;         //拉低1us
+ 163   2          ds_out=1;
+ 164   2          i++;i++;      
+ 165   2          bi=ds_out;           //15us内读取
+ 166   2          byte=(byte>>1)|(bi<<7);    //移位
+ 167   2          i=4;
+ 168   2          while(i--);
+ 169   2        }
+ 170   1        return byte;
+ 171   1      }
+ 172          void ds_write(unsigned char dat)
+ 173          {
+ 174   1        unsigned char i,j;
+ 175   1        for(j=0;j<8;j++)
+ 176   1        {
+ 177   2          ds_out=0;         //拉低
+C51 COMPILER V9.00   EBOARD                                                                03/22/2020 16:33:49 PAGE 4   
+
+ 178   2          ds_out=dat&0x01;      //取最低位1
+ 179   2          i=6;            //延时60-120us
+ 180   2          while(i--);
+ 181   2          ds_out=1;           //释放
+ 182   2          dat>>=1;
+ 183   2        }
+ 184   1      }
+ 185          unsigned char init_ds18b20()         //ds18b20初始化
+ 186          {
+ 187   1        int i=0;
+ 188   1        ds_out=0;
+ 189   1        delay(1);
+ 190   1        ds_out=1; 
+ 191   1        while(ds_out)
+ 192   1        {
+ 193   2          delay15us(4);   //等待60-210us后检测
+ 194   2          i++;
+ 195   2          if(i>5)
+ 196   2          {
+ 197   3            return 1;      //初始化失败   超时
+ 198   3          } 
+ 199   2        }
+ 200   1        return 0;
+ 201   1      }
+ 202          void delay15us(unsigned char a)   //误差 -0.894097222222us
+ 203          {
+ 204   1          for(a=4;a>0;a--);
+ 205   1      }
+ 206          ///////////////////////////////////////hc-sr04///////
+ 207          unsigned int getdistance()  //接收超声并计算距离
+ 208          {
+ 209   1              unsigned int ss;//用于记录测得的距离
+ 210   1          TMOD=0x01;
+ 211   1              while(!echo);//当echo为高电平的时候，跳出循环
+ 212   1              TH0 = 0;
+ 213   1              TL0 = 0;
+ 214   1          TR0 = 1;//启动定时器0，开启计时
+ 215   1              while(echo);//echo不为0，即脉冲返回结束，计时结束
+ 216   1              TR0 = 0;//停止计时
+ 217   1              ss=((TH0 * 256 + TL0)/2)*3.4;//单位是xxx.xxcm  可*1.1修正   范围大约2cm-400cm
+ 218   1              TH0 = 0;
+ 219   1              TL0 = 0;
+ 220   1          return ss;
+ 221   1      }
+ 222          void startmodule()             //发射超声
+ 223            {
+ 224   1          trig=1;                          
+ 225   1          delay(1);
+ 226   1          trig=0;
+ 227   1        }
+ 228          ///////////////////////////////////////ds12c887////////////////////////////////
+ 229          void write_ds12c887(unsigned char add_ds12c887,unsigned char date_ds12c887)
+ 230          {
+ 231   1          dsas=1;
+ 232   1        dsds=1;
+ 233   1        dsrw=1;
+ 234   1        P0=add_ds12c887;
+ 235   1        dsas=0;
+ 236   1        dsrw=0;
+ 237   1        P0=date_ds12c887;
+ 238   1        dsrw=1;
+ 239   1        dsas=1;
+C51 COMPILER V9.00   EBOARD                                                                03/22/2020 16:33:49 PAGE 5   
+
+ 240   1      }
+ 241          unsigned char read_ds12c887(unsigned char add_ds12c887)
+ 242          {
+ 243   1          unsigned char ds_date;
+ 244   1          dsas=1;
+ 245   1        dsds=1;
+ 246   1        dsrw=1;
+ 247   1        P0=add_ds12c887; 
+ 248   1        dsas=0;
+ 249   1        P0=0XFF;
+ 250   1        dsds=0;
+ 251   1        ds_date=P0;
+ 252   1        dsds=1;
+ 253   1        dsas=1;
+ 254   1        return ds_date;             
+ 255   1      }
+ 256          
+ 257          /////////////////////////////////////////1602/////////////////////////////////////
+ 258          void init_1602()  //初始化     
+ 259          {
+ 260   1        rw_1602=0;       //写
+ 261   1        write_1602(0x38,0);  //液晶设置不判忙模式
+ 262   1        delay(15);
+ 263   1        write_1602(0x38,0);
+ 264   1        delay(5);
+ 265   1        write_1602(0x0c,0);  //光标设置0000 1dcb   d:1:开 0:关 c:1:开光标 0:关光标 b:1:闪烁 0:不闪烁 
+ 266   1        write_1602(0x06,0); //0000 01ns   n:1:每次指针加一（光标后移）0：减一  s:整屏左移（n=1）
+ 267   1      }
+ 268          void write_1602(unsigned char order_data,char i)  //i==1:data,i==0:order   //写 数据1 命令0
+ 269          {
+ 270   1           e_1602=0;                  //write_1602(0x80,0);指针(光标)指向一行一个(一行80----80+27;;二行80+40------40+27)
+ 271   1           rs_1602=i;                  //0x01清屏  0
+ 272   1           P0=order_data;
+ 273   1           e_1602=1;                   //'1' '2' 'd' 'b'  1  显示相应字符,其他的查看手册
+ 274   1             delay(1);
+ 275   1             e_1602=0;
+ 276   1      }
+ 277          
+ 278          //////////////////////////////数码管//////////////////////////////
+ 279          void smg(unsigned char w,unsigned char d)    //位 段
+ 280          {
+ 281   1        smg_w(w);
+ 282   1        smg_d(d);
+ 283   1        delay(1);
+ 284   1        smg_w(8);
+ 285   1        smg_d(11);
+ 286   1        _nop_();
+ 287   1      }
+ 288          void smg_w(unsigned char i)
+ 289          {
+ 290   1        unsigned char smw[]={0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80,0x00,};
+ 291   1        wei=1;
+ 292   1        P0=smw[i];
+ 293   1        wei=0;
+ 294   1      }
+ 295          void smg_d(unsigned char i)
+ 296          {
+ 297   1        unsigned char smd[]={0xc0,0xf9,0xa4,0xb0,0x99,0x92,0x82,0xf8,0x80,0x90,0x7f,0xff,0xbf,};//12:  -
+ 298   1        duan=1;
+ 299   1        P0=smd[i];
+ 300   1        duan=0;
+ 301   1      }
+C51 COMPILER V9.00   EBOARD                                                                03/22/2020 16:33:49 PAGE 6   
+
+ 302          ///////////////////////////hc595////////////////////////////
+ 303          void hc595(unsigned char m)
+ 304          {
+ 305   1        unsigned char a;
+ 306   1        sck_hc595=0;
+ 307   1        for(a=0;a<8;a++)
+ 308   1        {
+ 309   2          lck_hc595=0;
+ 310   2          sdi_hc595=(m<<a)&0x80;
+ 311   2          lck_hc595=1;
+ 312   2        }
+ 313   1        sck_hc595=1;
+ 314   1        sdi_hc595=1;  
+ 315   1      }
+ 316          //////////////////////////////delay//////////////////////
+ 317          void delay(unsigned int a)
+ 318          { 
+ 319   1        unsigned int b;
+ 320   1        for(;a>0;a--)     
+ 321   1          for(b=114;b>0;b--);
+ 322   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    935    ----
+   CONSTANT SIZE    =     38    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----      64
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

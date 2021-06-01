@@ -1,0 +1,55 @@
+C51 COMPILER V9.00   JISHI                                                                 07/05/2019 23:41:08 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE JISHI
+OBJECT MODULE PLACED IN jishi.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE jishi.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include<reg52.h>
+   2          
+   3          sbit led=P1^0;
+   4          sbit sw=P1^2;
+   5          
+   6          int a=18000;
+   7          
+   8          int time(int M)
+   9          {
+  10   1              int a,b;
+  11   1              for(a=M;a>0;a--)                
+  12   1                      {
+  13   2                              for(b=114;b>0;b--);
+  14   2                      }
+  15   1      }
+  16          void main()
+  17          {         
+  18   1              while(1)
+  19   1              {
+  20   2                      if (a>0)
+  21   2                      {
+  22   3                              sw=1;
+  23   3                              led=1;
+  24   3                              time(500);
+  25   3                              led=0;
+  26   3                              time(500);
+  27   3                              a=a-1;
+  28   3                      }        
+  29   2                      sw=0;
+  30   2              }               
+  31   1      }
+*** WARNING C290 IN LINE 15 OF JISHI.C: missing return value
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     77    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      2    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  1 WARNING(S),  0 ERROR(S)

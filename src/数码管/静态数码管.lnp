@@ -1,0 +1,4 @@
+"STARTUP.obj",
+"静态数码管.obj" 
+TO "静态数码管" 
+RAMSIZE(256) 

@@ -1,0 +1,61 @@
+C51 COMPILER V9.00   1                                                                     02/17/2016 14:19:11 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE 1
+OBJECT MODULE PLACED IN 1.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE 1.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include<reg52.h>
+   2          sbit sdi=P1^0;
+   3          sbit lck=P1^4;
+   4          sbit sck=P2^3;
+   5          
+   6          void yanshi(int i)
+   7          {
+   8   1              int x,y;
+   9   1         for(x=i;x>0;x--)
+  10   1              for(y=114;y>0;y--);
+  11   1      }
+  12          
+  13          void hc595(int m)
+  14          {
+  15   1              int a;
+  16   1              sck=0;
+  17   1              for(a=0;a<8;a++)
+  18   1              {
+  19   2                      lck=0;
+  20   2                      sdi=(m<<a)&0x80;
+  21   2                      lck=1;
+  22   2              }
+  23   1              sck=1;
+  24   1              sdi=1;  
+  25   1      }
+  26          
+  27          void main()
+  28          {
+  29   1              int d;
+  30   1              for(d=1000;d>=0;)
+  31   1              {
+  32   2              hc595(0x04);
+  33   2              yanshi(d);
+  34   2              hc595(0x00);
+  35   2              yanshi(d);
+  36   2              d=d-15;
+  37   2              }
+  38   1      }       
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    136    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       2
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

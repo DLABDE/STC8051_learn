@@ -1,0 +1,246 @@
+#include<reg51.h>
+#include<stdlib.h>
+sbit aj=P2^1;
+sbit aj2=P2^2;
+sbit aj3=P2^3;
+sbit aj4=P2^4;
+sbit md=P2^5;
+sbit a=P1^0;
+sbit b=P1^1;
+sbit c=P1^2;
+sbit d=P1^3;
+sbit e=P1^4;
+sbit f=P1^5;
+sbit g=P1^6;
+sbit dp=P1^7;
+
+void ys(int b)
+{
+	int i,x,y;
+	i=b;
+	for(x=i;x>0;x--)
+		for(y=114;y>0;y--);	
+}
+
+
+void gg()
+{
+	a=1;
+	b=1;
+	c=1;
+	d=1;
+	e=1;
+	f=1;
+	g=1;
+	dp=1;
+}
+
+void one()
+{
+	gg();
+	d=0;
+	g=0;
+}
+
+void two()
+{
+	gg();
+	c=0;
+	d=0;
+	a=0;
+	e=0;
+	f=0;
+}
+
+void three()
+{
+	gg();
+	c=0;
+	d=0;
+	a=0;
+	g=0;
+	f=0;
+}
+
+void four()
+{
+	gg();
+	b=0;
+	a=0;
+	d=0;
+	g=0;
+}
+
+void five()
+{
+	gg();
+	c=0;
+	b=0;
+	a=0;
+	g=0;
+	f=0;
+}
+
+void six()
+{
+	gg();
+	c=0;
+	b=0;
+	a=0;
+	g=0;
+	f=0;
+	e=0;
+}
+
+void seven()
+{
+	gg();
+	c=0;
+	d=0;
+	g=0;
+}
+
+void eight()
+{
+	gg();
+	a=0;
+	b=0;
+	c=0;
+	d=0;
+	e=0;
+	f=0;
+	g=0;
+}
+
+void nine()
+{
+	gg();
+	a=0;
+	b=0;
+	c=0;
+	d=0;
+	f=0;
+	g=0;
+}
+
+long int change(long int n,long int sum)
+{
+	long int a,d,b=1,i;
+	if(n==1) return(sum+1);
+	else
+	{
+		for(a=2,i=1;2*a<=n;a=2*a,i++);
+   	  	for(d=1;d<=i;d++) b=b*10;
+   		sum=sum+b;
+   		if(a==n) 
+    	return(sum);
+    	else
+   	  	{
+	 		b=1;
+			change((n-a),sum);
+		}
+	}
+}
+/*void sheng()
+{
+	unsigned int a,x;
+	for(a=0;a<456;a++)
+	{
+		shen=!shen;
+		for(x=0;x<80;x++);	 //ÆµÂÊ
+	}
+}			*/				   
+void main()
+{
+	int xushu=0,js=0,x=0,time=0,a=0;
+	while(1)
+	{
+		md=0;
+		aj=1;
+		aj2=1;
+		aj3=1;
+		aj4=1;
+		loop:
+		gg();
+		if(a==0)
+		{
+			if(aj==0)
+			{
+				ys(10);
+				if(aj==0)
+				{
+					while(aj==0)
+					{
+						time++;
+					}
+					srand(time);
+					xushu=rand()%10;
+				}
+			}
+			a=a+1;
+		}
+		aj=1;
+		if(xushu==0)
+		{
+			a=a-1;
+			goto loop;
+		}
+		switch(xushu)
+		{
+			case 1:	one();	break;
+			case 2:	two();	break;
+			case 3:	three();	break;
+			case 4:	four();	break;
+			case 5:	five();	break;
+			case 6:	six();	break;
+			case 7:	seven();	break;
+			case 8:	eight();	break;
+			case 9:	nine();	break;
+			 
+		}
+			if(aj==0)
+			{
+				ys(10);
+				if(aj==0)
+				{
+					while(!aj);
+					js=js+100;	
+				}
+			}
+			if(aj2==0)
+			{
+				ys(10);
+				if(aj2==0)
+				{
+					while(!aj2);
+					js=js+10;	
+				}
+			}
+			if(aj3==0)
+			{
+				ys(10);
+				if(aj3==0)
+				{
+					while(!aj3);
+					js=js+1;	
+				}
+			}
+			if(aj4==0)
+			{
+				ys(10);
+				if(aj4==0)
+				{
+					while(!aj4);
+					x=change(xushu,0);
+					if(js==x)
+					{
+						md=1;
+						ys(2000);
+						md=0;
+						js=0;
+						break;
+					}	
+				}
+			}
+	}
+}

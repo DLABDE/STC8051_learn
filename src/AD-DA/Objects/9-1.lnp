@@ -1,0 +1,4 @@
+".\Objects\eboard.obj",
+".\Objects\main.obj" 
+TO ".\Objects\9-1" 
+PRINT(".\Listings\9-1.m51") RAMSIZE(256) 

@@ -1,0 +1,108 @@
+C51 COMPILER V9.00   DUOJI                                                                 03/18/2020 18:59:01 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE DUOJI
+OBJECT MODULE PLACED IN duoji.OBJ
+COMPILER INVOKED BY: D:\Program Files (x86)\keil\C51\BIN\C51.EXE duoji.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND TAB
+                    -S(2)
+
+line level    source
+
+   1          #include"eboard.h"
+   2          #define uchar unsigned char
+   3          #define uint unsigned int
+   4          
+   5          sbit pwm=P2^2;      //ÐÅºÅÊä³ö
+   6          sbit pp=P2^3;
+   7          sbit mq=P1^5;
+   8          uchar count=0;
+   9          uchar n=22;  
+  10          uchar m=22;
+  11          
+  12          
+  13          void domove(uchar i,uchar j)
+  14          {
+  15   1          TMOD = 0x01;         //  0.1ms   11.0592Mhz
+  16   1          TH0 = 0xFF;
+  17   1          TL0 = 0XA4;
+  18   1          EA = 1;
+  19   1          ET0 = 1;
+  20   1          TR0 = 1;
+  21   1          m=i;
+  22   1          n=j;
+  23   1          delay(3);
+  24   1      }
+  25          void main()
+  26          {
+  27   1          uint a;
+  28   1          init_1602();
+  29   1          mq=1;
+  30   1          domove(17,21);
+  31   1          while(1)
+  32   1          {
+  33   2            a=1.1*getdistance();
+  34   2            write_1602(0x85,0);
+  35   2            write_1602(0x30+a/10000%10,1);
+  36   2            write_1602(0x30+a/1000%10,1);
+  37   2            write_1602(0x30+a/100%10,1);
+  38   2            write_1602(0x30+a/10%10,1);
+  39   2            if(a<=13630)
+  40   2            {
+  41   3              domove(7,12);
+  42   3              mq=0;
+  43   3              delay(2400);
+  44   3              mq=1;
+  45   3              domove(17,21);
+  46   3              a=14000;
+  47   3            }
+  48   2            delay(300);
+  49   2          }
+  50   1      }
+  51          
+  52          void Timer() interrupt 1     
+  53          {
+  54   1          TH0 = 0xFF;
+C51 COMPILER V9.00   DUOJI                                                                 03/18/2020 18:59:01 PAGE 2   
+
+  55   1          TL0 = 0xA4;
+  56   1        count++;
+  57   1          if(count<=200)
+  58   1          {
+  59   2            if(count<=n)
+  60   2              {
+  61   3                pwm=1;
+  62   3              }
+  63   2              else
+  64   2              {
+  65   3                pwm=0;
+  66   3              }
+  67   2          if(count<=m)
+  68   2              {
+  69   3            pp=1;
+  70   3              }
+  71   2              else
+  72   2              {
+  73   3            pp=0;
+  74   3              }
+  75   2          }
+  76   1          else
+  77   1          {
+  78   2            count=0;
+  79   2            pwm=0;
+  80   2          pp=0;
+  81   2          }
+  82   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    286    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      3       2
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
